@@ -16,36 +16,17 @@ st.set_page_config(
 )
 
 # -------------------------------------------------
-# ARKA PLAN
+# ARKA PLAN YOK (SİLİNDİ)
 # -------------------------------------------------
-def set_main_background(image_path: str):
-    try:
-        with open(image_path, "rb") as f:
-            data = base64.b64encode(f.read()).decode()
 
-        st.markdown(
-            f"""
-            <style>
-            section[data-testid="stSidebar"] > div:first-child {{
-                background-color: #0D1B2A !important;
-            }}
-            section.main {{
-                background-image:
-                    linear-gradient(rgba(255,255,255,0.90), rgba(255,255,255,0.90)),
-                    url("data:image/png;base64,{data}");
-                background-repeat: no-repeat;
-                background-position: center;
-                background-size: 55%;
-            }}
-            </style>
-            """,
-            unsafe_allow_html=True,
-        )
-    except Exception as e:
-        st.write("Arka plan yüklenemedi:", e)
-
-set_main_background("hum_logo.png")
-
+# Ana arka plan beyaz olsun
+st.markdown("""
+<style>
+    .stApp {
+        background-color: white !important;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # -------------------------------------------------
 # NAVBAR
@@ -446,3 +427,4 @@ elif selected_mod == "kodlama":
 # -------------------------------------------------
 st.markdown("---")
 st.caption(f"HUM Paneli • Python {sys.version.split()[0]}")
+
