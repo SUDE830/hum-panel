@@ -20,7 +20,7 @@ st.markdown("""
 
     /* ANA ARKA PLAN */
     .stApp {
-        background-color: white !important;
+        background-color: black !important;
     }
 
     /* SIDEBAR TEMA */
@@ -172,6 +172,16 @@ MODULES = [
     ("profil","Profil Ağırlık Cetveli"),
     ("kodlama","Kodlama Sistematiği")
 ]
+LOGO_URL = "https://raw.githubusercontent.com/SUDE830/hum-panel/main/hum_logo.png"
+
+st.markdown(
+    f"""
+    <div class="sidebar-logo">
+        <img src="{LOGO_URL}" width="150" style="border-radius:8px; margin-bottom:20px;">
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 with st.sidebar:
     st.markdown('<div class="sidebar-logo"><img src="https://i.imgur.com/Sz5Z7GU.png" width="140"></div>', unsafe_allow_html=True)
@@ -427,3 +437,4 @@ elif selected_mod == "kodlama":
 # -------------------------------------------------
 st.markdown("---")
 st.caption(f"HUM Paneli • Python {sys.version.split()[0]}")
+
