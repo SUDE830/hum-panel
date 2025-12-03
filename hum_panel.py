@@ -293,7 +293,7 @@ with st.sidebar:
 # NAVBAR
 # -------------------------------------------------
 st.markdown(
-    '<div class="hum-navbar">HUM Mühendislik Paneli</div>',
+    '<div class="hum-navbar">HUM Makine Paneli</div>',
     unsafe_allow_html=True,
 )
 
@@ -722,3 +722,4 @@ elif selected_mod == "kodlama":
 # -------------------------------------------------
 st.markdown("---")
 st.caption(f"HUM Paneli • Python {sys.version.split()[0]}")
+
