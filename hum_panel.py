@@ -1,119 +1,16 @@
 # -- coding: utf-8 --
 import math
 import sys
-from io import BytesIO
-from typing import Dict, List
-import base64
 import streamlit as st
 import pandas as pd
+from typing import Dict, List
 
 # -------------------------------------------------
-# SAYFA AYARLARI
+# SAYFA AYARLARI (beyaz ekran)
 # -------------------------------------------------
 st.set_page_config(
     page_title="HUM İşlemler Paneli",
     layout="wide",
-)
-
-# -------------------------------------------------
-# GLOBAL TASARIM (PROFESYONEL UI)
-# -------------------------------------------------
-st.markdown("""
-<style>
-
-    /* --- SAYFA ARKA PLANI --- */
-    .stApp {
-        background-color: #ffffff !important;
-    }
-
-    /* --- SIDEBAR TASARIMI --- */
-    section[data-testid="stSidebar"] > div:first-child {
-        background-color: #0D1B2A !important;
-        padding-top: 20px;
-    }
-
-    /* Sidebar yazıları beyaz */
-    section[data-testid="stSidebar"] * {
-        color: #ffffff !important;
-        font-size: 15px !important;
-    }
-
-    /* --- BAŞLIK TASARIMLARI --- */
-    h1, h2, h3, h4 {
-        color: #0D1B2A !important;
-        font-weight: 700 !important;
-        margin-top: 20px !important;
-        margin-bottom: 10px !important;
-    }
-
-    /* --- RADIO BUTTON RENKLERİ --- */
-    div[role="radiogroup"] > label > div:first-child span {
-        background-color: #ffffff !important;
-        border: 2px solid #4cc9f0 !important;
-    }
-
-    /* Seçili radio mavi */
-    div[role="radiogroup"] > label[data-checked="true"] > div:first-child span {
-        background-color: #4cc9f0 !important;
-        border-color: #4cc9f0 !important;
-    }
-
-    /* --- NUMBER INPUT (sayı kutuları) --- */
-    .stNumberInput input {
-        background-color: #f7f7f7 !important;
-        border-radius: 6px;
-        border: 1px solid #c9c9c9 !important;
-        color: #000 !important;
-        font-size: 16px !important;
-        height: 40px !important;
-    }
-
-    /* --- "+" ve "-" butonları --- */
-    .stNumberInput button {
-        background-color: #0D1B2A !important;
-        color: white !important;
-        border-radius: 5px !important;
-        border: none !important;
-    }
-
-    /* --- KG sonuç yazıları --- */
-    .kg-label {
-        font-size: 18px;
-        font-weight: 700;
-        color: #0D1B2A !important;
-        padding-left: 10px;
-    }
-
-    /* --- TOP NAVBAR --- */
-    .hum-navbar {
-        background-color: #0D1B2A;
-        color: white;
-        padding: 0.8rem 1.2rem;
-        font-size: 20px;
-        font-weight: 700;
-        border-radius: 6px;
-        text-align: center;
-    }
-
-</style>
-""", unsafe_allow_html=True)
-
-# -------------------------------------------------
-# NAVBAR
-# -------------------------------------------------
-st.markdown(
-    """
-    <div class="hum-navbar">HUM Mühendislik Paneli</div>
-    """,
-    unsafe_allow_html=True,
-)
-
-# -------------------------------------------------
-# LOGO – HER CİHAZDA DOĞRU GÖRÜNÜR
-# -------------------------------------------------
-st.image(
-    "https://raw.githubusercontent.com/SUDE830/hum-panel/main/hum_logo.png",
-    width=160,
 )
 
 # -------------------------------------------------
@@ -189,7 +86,7 @@ NPI_KATSAYI = {
 }
 
 # -------------------------------------------------
-# SIDEBAR MENÜ
+# MODÜL LİSTESİ
 # -------------------------------------------------
 MODULES = [
     ("kestamit", "KESTAMİT LEVHALAR AD-KG"),
@@ -209,7 +106,12 @@ MODULES = [
     ("kodlama", "Kodlama Sistematiği"),
 ]
 
+# -------------------------------------------------
+# SIDEBAR (LOGO EKLENDİ)
+# -------------------------------------------------
 with st.sidebar:
+    st.image("hum_logo.png", use_column_width=True)
+
     st.title("İŞLEMLER")
 
     if st.button("Tümünü Sıfırla"):
@@ -222,37 +124,55 @@ with st.sidebar:
     selected_mod = [mid for mid, lbl in MODULES if lbl == selection][0]
 
 # -------------------------------------------------
+# NAVBAR
+# -------------------------------------------------
+st.markdown(
+    """
+    <div style='background-color:#081A2B;padding:12px;border-radius:6px;
+    text-align:center;margin-bottom:20px'>
+    <h2 style='color:white;margin:0;'>HUM Mühendislik Paneli</h2>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+# -------------------------------------------------
 # MODÜLLER
 # -------------------------------------------------
 def render_levha_multi(mod_id, title, yogunluk):
     st.header(title)
-    br = "(Br-2)"  # özel istek
+    br = "(Br-2)"
 
     for i in range(1, 6):
-        cols = st.columns([0.4, 1, 1, 1, 1])
+        cols = st.columns([0.45, 1, 1, 1, 1])
         cols[0].markdown(f"**{i}. Ürün**")
 
-        kal = cols[1].number_input("Kalınlık (mm)", 0.0, step=0.1, key=key(mod_id, "kal", i),
+        kal = cols[1].number_input("Kalınlık (mm)", 0.0, step=0.1,
+                                   key=key(mod_id, "kal", i),
                                    label_visibility="visible" if i == 1 else "collapsed")
-        en = cols[2].number_input("En (mm)", 0.0, step=1.0, key=key(mod_id, "en", i),
+        en = cols[2].number_input("En (mm)", 0.0, step=1.0,
+                                  key=key(mod_id, "en", i),
                                   label_visibility="visible" if i == 1 else "collapsed")
-        boy = cols[3].number_input("Boy (mm)", 0.0, step=1.0, key=key(mod_id, "boy", i),
+        boy = cols[3].number_input("Boy (mm)", 0.0, step=1.0,
+                                   key=key(mod_id, "boy", i),
                                    label_visibility="visible" if i == 1 else "collapsed")
 
         kg = yogunluk * kal * (en/1000) * (boy/1000) if kal and en and boy else None
 
-        cols[4].markdown(f"<span class='kg-label'>Kg/Adet {br}: {fmt(kg)}</span>", unsafe_allow_html=True)
+        cols[4].markdown(f"**Kg/Adet {br}:** {fmt(kg)}")
 
 
 def render_celik_mil():
     st.header("ÇELİK MİL AD-MM-KG")
     for i in range(1, 6):
-        cols = st.columns([0.4, 1, 1, 1])
+        cols = st.columns([0.45, 1, 1, 1])
         cols[0].markdown(f"**{i}. Ürün**")
 
-        cap = cols[1].number_input("Çap (mm)", 0.0, step=0.1, key=key("celik_mil", "cap", i),
+        cap = cols[1].number_input("Çap (mm)", 0.0, step=0.1,
+                                   key=key("celik_mil", "cap", i),
                                    label_visibility="visible" if i == 1 else "collapsed")
-        boy = cols[2].number_input("Boy (mm)", 0.0, step=1.0, key=key("celik_mil", "boy", i),
+        boy = cols[2].number_input("Boy (mm)", 0.0, step=1.0,
+                                   key=key("celik_mil", "boy", i),
                                    label_visibility="visible" if i == 1 else "collapsed")
 
         if cap and boy:
@@ -260,86 +180,99 @@ def render_celik_mil():
         else:
             kg = None
 
-        cols[3].markdown(f"<span class='kg-label'>Kg/Adet (Br-3): {fmt(kg)}</span>", unsafe_allow_html=True)
+        cols[3].markdown(f"**Kg/Adet (Br-3):** {fmt(kg)}")
 
 
 def render_altikose():
     st.header("ALTIKÖŞE AD-MM-KG")
     for i in range(1, 6):
-        cols = st.columns([0.4, 1, 1, 1])
+        cols = st.columns([0.45, 1, 1, 1])
         cols[0].markdown(f"**{i}. Ürün**")
 
-        ebat = cols[1].number_input("Ebat (mm)", 0.0, step=0.1, key=key("altikose", "ebat", i),
+        ebat = cols[1].number_input("Ebat (mm)", 0.0, step=0.1,
+                                    key=key("altikose", "ebat", i),
                                     label_visibility="visible" if i == 1 else "collapsed")
-        boy = cols[2].number_input("Boy (mm)", 0.0, step=1.0, key=key("altikose", "boy", i),
+        boy = cols[2].number_input("Boy (mm)", 0.0, step=1.0,
+                                   key=key("altikose", "boy", i),
                                    label_visibility="visible" if i == 1 else "collapsed")
 
         kg = (ebat**2 * boy * 0.012) / (math.sqrt(3)*1000) if ebat and boy else None
-        cols[3].markdown(f"<span class='kg-label'>Kg/Adet (Br-3): {fmt(kg)}</span>", unsafe_allow_html=True)
-
+        cols[3].markdown(f"**Kg/Adet (Br-3):** {fmt(kg)}")
 
 def render_kare():
     st.header("KARE AD-MM-KG")
     for i in range(1, 6):
-        cols = st.columns([0.4, 1, 1, 1])
+        cols = st.columns([0.45, 1, 1, 1])
         cols[0].markdown(f"**{i}. Ürün**")
 
-        ebat = cols[1].number_input("Ebat (mm)", 0.0, step=0.1, key=key("kare", "ebat", i),
+        ebat = cols[1].number_input("Ebat (mm)", 0.0, step=0.1,
+                                    key=key("kare", "ebat", i),
                                     label_visibility="visible" if i == 1 else "collapsed")
-        boy = cols[2].number_input("Boy (mm)", 0.0, step=1.0, key=key("kare", "boy", i),
+        boy = cols[2].number_input("Boy (mm)", 0.0, step=1.0,
+                                   key=key("kare", "boy", i),
                                    label_visibility="visible" if i == 1 else "collapsed")
 
         kg = (ebat*ebat*boy*0.00785)/1000 if ebat and boy else None
-        cols[3].markdown(f"<span class='kg-label'>Kg/Adet (Br-3): {fmt(kg)}</span>", unsafe_allow_html=True)
+        cols[3].markdown(f"**Kg/Adet (Br-3):** {fmt(kg)}")
 
 
 def render_lama():
     st.header("LAMA AD-MM-KG")
     for i in range(1, 6):
-        cols = st.columns([0.4, 1, 1, 1, 1])
+        cols = st.columns([0.45, 1, 1, 1, 1])
         cols[0].markdown(f"**{i}. Ürün**")
 
-        gen = cols[1].number_input("Genişlik (mm)", 0.0, step=0.1, key=key("lama", "gen", i),
+        gen = cols[1].number_input("Genişlik (mm)", 0.0, step=0.1,
+                                   key=key("lama", "gen", i),
                                    label_visibility="visible" if i == 1 else "collapsed")
-        yuk = cols[2].number_input("Yükseklik (mm)", 0.0, step=0.1, key=key("lama", "yuk", i),
+        yuk = cols[2].number_input("Yükseklik (mm)", 0.0, step=0.1,
+                                   key=key("lama", "yuk", i),
                                    label_visibility="visible" if i == 1 else "collapsed")
-        boy = cols[3].number_input("Boy (mm)", 0.0, step=1.0, key=key("lama", "boy", i),
+        boy = cols[3].number_input("Boy (mm)", 0.0, step=1.0,
+                                   key=key("lama", "boy", i),
                                    label_visibility="visible" if i == 1 else "collapsed")
 
         kg = (gen*yuk*boy*0.00785)/1000 if gen and yuk and boy else None
-        cols[4].markdown(f"<span class='kg-label'>Kg/Adet (Br-3): {fmt(kg)}</span>", unsafe_allow_html=True)
+        cols[4].markdown(f"**Kg/Adet (Br-3):** {fmt(kg)}")
 
 
 def render_kosebent():
-    st.header("KÖŞEBENT AD-MM-KG")
+    st.header("КÖŞEBENT AD-MM-KG")
     for i in range(1, 6):
-        cols = st.columns([0.4, 1, 1, 1, 1])
+        cols = st.columns([0.45, 1, 1, 1, 1])
         cols[0].markdown(f"**{i}. Ürün**")
 
-        ebat = cols[1].number_input("Ebat (mm)", 0.0, step=0.1, key=key("kosebent", "ebat", i),
+        ebat = cols[1].number_input("Ebat (mm)", 0.0, step=0.1,
+                                    key=key("kosebent", "ebat", i),
                                     label_visibility="visible" if i == 1 else "collapsed")
-        et = cols[2].number_input("Et (mm)", 0.0, step=0.1, key=key("kosebent", "et", i),
+        et = cols[2].number_input("Et (mm)", 0.0, step=0.1,
+                                  key=key("kosebent", "et", i),
                                   label_visibility="visible" if i == 1 else "collapsed")
-        boy = cols[3].number_input("Boy (mm)", 0.0, step=1.0, key=key("kosebent", "boy", i),
+        boy = cols[3].number_input("Boy (mm)", 0.0, step=1.0,
+                                   key=key("kosebent", "boy", i),
                                    label_visibility="visible" if i == 1 else "collapsed")
 
         kg = (2*ebat*et*boy*0.00785)/1000 if ebat and et and boy else None
-        cols[4].markdown(f"<span class='kg-label'>Kg/Adet (Br-3): {fmt(kg)}</span>", unsafe_allow_html=True)
+        cols[4].markdown(f"**Kg/Adet (Br-3):** {fmt(kg)}")
 
 
 def render_celik_cek_boru():
     st.header("ÇELİK ÇEKME BORU AD-MM-KG")
     for i in range(1, 6):
-        cols = st.columns([0.4, 1, 1, 1, 1, 1])
+        cols = st.columns([0.45, 1, 1, 1, 1, 1])
         cols[0].markdown(f"**{i}. Ürün**")
 
-        dis_cap = cols[1].number_input("Dış Çap (mm)", 0.0, step=0.1, key=key("celik_cek_boru", "dis", i),
+        dis_cap = cols[1].number_input("Dış Çap (mm)", 0.0, step=0.1,
+                                       key=key("celik_cek_boru", "dis", i),
                                        label_visibility="visible" if i == 1 else "collapsed")
-        et = cols[2].number_input("Et (mm)", 0.0, step=0.1, key=key("celik_cek_boru", "et", i),
+        et = cols[2].number_input("Et (mm)", 0.0, step=0.1,
+                                  key=key("celik_cek_boru", "et", i),
                                   label_visibility="visible" if i == 1 else "collapsed")
-        boy = cols[3].number_input("Boy (mm)", 0.0, step=1.0, key=key("celik_cek_boru", "boy", i),
+        boy = cols[3].number_input("Boy (mm)", 0.0, step=1.0,
+                                   key=key("celik_cek_boru", "boy", i),
                                    label_visibility="visible" if i == 1 else "collapsed")
-        ic_cap = cols[4].number_input("İç Çap (mm)", 0.0, step=0.1, key=key("celik_cek_boru", "ic", i),
+        ic_cap = cols[4].number_input("İç Çap (mm)", 0.0, step=0.1,
+                                      key=key("celik_cek_boru", "ic", i),
                                       label_visibility="visible" if i == 1 else "collapsed")
 
         if dis_cap and boy and (et or ic_cap):
@@ -350,96 +283,96 @@ def render_celik_cek_boru():
         else:
             kg = None
 
-        cols[5].markdown(f"<span class='kg-label'>Kg/Adet (Br-3): {fmt(kg)}</span>", unsafe_allow_html=True)
+        cols[5].markdown(f"**Kg/Adet (Br-3):** {fmt(kg)}")
 
 
 def render_dik_boru_kutu():
     st.header("DİK BORU & KUTU PROFİL AD-MM-MT")
     for i in range(1, 6):
-        cols = st.columns([0.4, 1, 1])
+        cols = st.columns([0.45, 1, 1])
         cols[0].markdown(f"**{i}. Ürün**")
 
-        boy = cols[1].number_input("Boy (mm)", 0.0, step=1.0, key=key("dik_boru_kutu", "boy", i),
+        boy = cols[1].number_input("Boy (mm)", 0.0, step=1.0,
+                                   key=key("dik_boru_kutu", "boy", i),
                                    label_visibility="visible" if i == 1 else "collapsed")
 
         mt = boy/1000 if boy else None
-        cols[2].markdown(f"<span class='kg-label'>mt/Adet: {fmt(mt)}</span>", unsafe_allow_html=True)
+        cols[2].markdown(f"**mt/Adet:** {fmt(mt)}")
 
 
-def render_profil(mod_id, title, kats):
+def render_profil(m_id, title, kats):
     st.header(title)
 
     ebats = sorted(kats.keys())
 
     for i in range(1, 6):
-        cols = st.columns([0.4, 1, 1, 1])
+        cols = st.columns([0.45, 1, 1, 1])
         cols[0].markdown(f"**{i}. Ürün**")
 
-        ebat = cols[1].selectbox("Ebat (mm)", ebats, key=key(mod_id, "ebat", i),
+        ebat = cols[1].selectbox("Ebat", ebats, key=key(m_id, "ebat", i),
                                  label_visibility="visible" if i == 1 else "collapsed")
 
-        boy = cols[2].number_input("Boy (mm)", 0.0, step=1.0, key=key(mod_id, "boy", i),
+        boy = cols[2].number_input("Boy (mm)", 0.0, step=1.0,
+                                   key=key(m_id, "boy", i),
                                    label_visibility="visible" if i == 1 else "collapsed")
 
         kg = kats[ebat] * boy / 1000 if boy else None
-
-        cols[3].markdown(f"<span class='kg-label'>Kg/Adet (Br-3): {fmt(kg)}</span>", unsafe_allow_html=True)
+        cols[3].markdown(f"**Kg/Adet (Br-3):** {fmt(kg)}")
 
 
 def render_profil_cetveli():
     st.header("Profil Ağırlık Cetveli")
-    st.write("Bu bölüm sadeleştirildi, tablo veya referans listesi ekleyebilirsin.")
+    st.write("Bu bölüm sadeleştirildi.")
 
 
 # -------------------------------------------------
-# KODLAMA SİSTEMATİĞİ
+# KODLAMA SİSTEMİ
 # -------------------------------------------------
-URETICI_MAP = {
-    "HK": "HUM kaynaklı imalat",
-    "HT": "HUM talaşlı imalat",
-    "FL": "Lazerci & sac işleme fason",
-    "FT": "Fason talaşlı imalat",
-}
-
-def build_mamul_code(prefix="M", siparis="", unite="", mamul_no=""):
-    parts = [prefix, siparis, unite, mamul_no]
-    return "-".join([p for p in parts if p.strip()])
-
-def build_yari_mamul_code(prefix="Y", uretici="HK", sip="", mno="", res="", a1="", a2="", a3=""):
-    parts = [prefix + uretici, sip, mno]
-    if res.strip(): parts.append(res)
-    for x in (a1, a2, a3):
-        if x.strip(): parts.append(x)
-    return "-".join(parts)
-
 def render_kodlama():
     st.header("Kodlama Sistematiği")
-    kod = ""
 
-    sol, sag = st.columns([1, 2])
+    URETICI_MAP = {
+        "HK": "HUM kaynaklı imalat",
+        "HT": "HUM talaşlı imalat",
+        "FL": "Lazerci & sac işleme fason",
+        "FT": "Fason talaşlı imalat",
+    }
 
-    with sol:
-        tip = st.radio("Tip:", ["MAMUL", "YARI MAMUL"], key="kod_tip")
+    def build_mamul(prefix="M", sip="", unite="", no=""):
+        parts = [prefix, sip, unite, no]
+        return "-".join([p for p in parts if p.strip()])
+
+    def build_yari(prefix="Y", u="HK", sip="", mno="", res="", a1="", a2="", a3=""):
+        parts = [prefix + u, sip, mno]
+        if res.strip(): parts.append(res)
+        for x in (a1, a2, a3):
+            if x.strip(): parts.append(x)
+        return "-".join(parts)
+
+    kol1, kol2 = st.columns([1, 2])
+
+    with kol1:
+        tip = st.radio("Tip:", ["MAMUL", "YARI MAMUL"])
 
         if tip == "MAMUL":
-            si = st.text_input("Sipariş No", key="kod_sip_m")
-            un = st.text_input("Ünite", key="kod_un_m")
-            mn = st.text_input("Mamul No", key="kod_no_m")
-            kod = build_mamul_code("M", si, un, mn)
+            si = st.text_input("Sipariş No")
+            un = st.text_input("Ünite")
+            mn = st.text_input("Mamul No")
+            kod = build_mamul("M", si, un, mn)
 
         else:
-            ure = st.selectbox("Üretici", list(URETICI_MAP.keys()), key="kod_u")
-            si = st.text_input("Sipariş No", key="kod_sip_y")
-            mn = st.text_input("Mamul No", key="kod_no_y")
-            rs = st.text_input("Resim No", key="kod_res_y")
-            a1 = st.text_input("Alt Poz 1", key="kod_a1")
-            a2 = st.text_input("Alt Poz 2", key="kod_a2")
-            a3 = st.text_input("Alt Poz 3", key="kod_a3")
-            kod = build_yari_mamul_code("Y", ure, si, mn, rs, a1, a2, a3)
+            ure = st.selectbox("Üretici", list(URETICI_MAP.keys()))
+            si = st.text_input("Sipariş No")
+            mn = st.text_input("Mamul No")
+            rs = st.text_input("Resim No")
+            a1 = st.text_input("Alt Poz 1")
+            a2 = st.text_input("Alt Poz 2")
+            a3 = st.text_input("Alt Poz 3")
+            kod = build_yari("Y", ure, si, mn, rs, a1, a2, a3)
 
-    with sag:
+    with kol2:
         st.subheader("Üretilen Kod")
-        st.code(kod if kod else "—")
+        st.code(kod)
         st.write("Uzunluk:", len(kod))
 
 
